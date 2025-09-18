@@ -1,0 +1,11 @@
+# Task ID: 8
+# Title: Implement mode toggle between text and image generation
+# Status: pending
+# Dependencies: 3, 7
+# Priority: medium
+# Description: Create a toggle mechanism to switch between text chat and image generation modes in the interface.
+# Details:
+Develop a toggle component using ShadUI to switch between text and image modes. Implement state management to track the current mode. Modify the input area and send button behavior based on the active mode. Update the UI to provide visual feedback about the current mode. Adjust the message processing logic to handle different types of requests based on the mode. Ensure smooth transitions between modes.
+
+# Test Strategy:
+Test switching between text and image modes. Verify that the UI updates correctly when the mode changes. Check that the appropriate API is called based on the active mode. Ensure the user experience remains intuitive when switching modes.

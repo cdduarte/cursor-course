@@ -1,0 +1,11 @@
+# Task ID: 4
+# Title: Implement OpenAI text chat with streaming responses
+# Status: pending
+# Dependencies: 3
+# Priority: high
+# Description: Integrate OpenAI's GPT-4.1-nano model with streaming capability to enable real-time text chat functionality.
+# Details:
+Create a service for OpenAI API communication. Implement the streaming API integration using OpenAI's SDK with the gpt-4.1-nano-2025-04-14 model. Set up server components in NextJS to handle the streaming responses. Create a client-side component to render the streaming text in real-time. Implement proper error handling for API failures. Use React state to manage the conversation flow and display messages as they arrive.
+
+# Test Strategy:
+Test the streaming functionality with various prompts. Verify that responses appear in real-time. Check error handling by simulating API failures. Ensure the UI updates correctly as new tokens arrive.

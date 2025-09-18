@@ -1,0 +1,11 @@
+# Task ID: 7
+# Title: Add image generation capability with OpenAI
+# Status: pending
+# Dependencies: 4, 5
+# Priority: medium
+# Description: Integrate OpenAI's gpt-image-1 model to enable AI image generation based on user prompts.
+# Details:
+Create a service for OpenAI image generation API using the gpt-image-1 model. Implement the API integration following the standard request/response pattern. Develop UI components to display generated images in the chat interface. Add logic to store image URLs in the database. Implement proper error handling for image generation failures. Create loading states for the image generation process.
+
+# Test Strategy:
+Test image generation with various prompts. Verify that images are correctly generated and displayed in the chat. Check that image URLs are properly stored in the database. Test error handling by simulating API failures.

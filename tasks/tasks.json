@@ -1,0 +1,195 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Set up NextJS project with TailwindCSS and ShadUI",
+        "description": "Initialize the project structure with NextJS App Directory, configure TailwindCSS for styling, and integrate ShadUI component library.",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "details": "Create a new NextJS project using 'create-next-app' with the App Directory structure. Install and configure TailwindCSS following the official documentation. Add ShadUI library for reusable components. Set up environment variables for API keys and endpoints. Create the basic folder structure following NextJS conventions with app directory, components folder, and lib/utils.",
+        "testStrategy": "Verify that the NextJS development server runs without errors. Confirm TailwindCSS styles are working by testing a sample component. Ensure ShadUI components render correctly."
+      },
+      {
+        "id": 2,
+        "title": "Configure Supabase local instance and database schema",
+        "description": "Set up a local Supabase instance and create the database schema for storing chat sessions and messages.",
+        "status": "pending",
+        "dependencies": [
+          1
+        ],
+        "priority": "high",
+        "details": "Install Supabase CLI and initialize a local Supabase instance. Create migration files for the database schema based on the data models specified in the PRD. Implement the Chat Session table with id, created_at, updated_at, and title fields. Create the Chat Message table with id, created_at, chat_id, role, content, type, and optional image_url fields. Set up foreign key relationships between tables. Configure Supabase client in the NextJS application.",
+        "testStrategy": "Run migrations and verify tables are created correctly. Test CRUD operations on both tables using the Supabase client. Ensure foreign key constraints work as expected.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install and initialize Supabase CLI locally",
+            "description": "Set up the Supabase CLI and initialize a local Supabase instance for development",
+            "dependencies": [],
+            "details": "1. Install Supabase CLI using npm: `npm install -g supabase`\n2. Initialize a new Supabase project: `supabase init`\n3. Start the local Supabase instance: `supabase start`\n4. Verify the installation by accessing the local Supabase Studio UI at the provided URL\n5. Save the local development credentials for later use in the application",
+            "status": "done",
+            "testStrategy": "Verify successful installation by checking that the Supabase dashboard is accessible and that the local PostgreSQL database can be connected to"
+          },
+          {
+            "id": 2,
+            "title": "Create migration files for database schema",
+            "description": "Create SQL migration files that define the database schema for chat sessions and messages",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "1. Create a new migration file using Supabase CLI: `supabase migration new initial_schema`\n2. In the generated SQL file, define the schema for both tables\n3. Include proper timestamps, UUID fields, and appropriate data types\n4. Add indexes for frequently queried fields\n5. Define the schema version and migration metadata",
+            "status": "pending",
+            "testStrategy": "Validate the SQL syntax using a SQL linter and ensure the migration file follows Supabase best practices"
+          },
+          {
+            "id": 3,
+            "title": "Implement Chat Session table",
+            "description": "Create the Chat Session table with required fields and constraints",
+            "dependencies": [
+              "2.2"
+            ],
+            "details": "1. In the migration file, define the `chat_sessions` table with columns:\n   - `id`: UUID primary key with default gen_random_uuid()\n   - `created_at`: timestamp with default now()\n   - `updated_at`: timestamp with default now()\n   - `title`: text not null\n   - `user_id`: UUID for future authentication integration\n2. Add appropriate indexes on frequently queried fields\n3. Set up RLS (Row Level Security) policies for future authentication",
+            "status": "pending",
+            "testStrategy": "Apply the migration and verify the table structure using Supabase Studio. Test inserting and querying sample records."
+          },
+          {
+            "id": 4,
+            "title": "Implement Chat Message table with foreign key relationships",
+            "description": "Create the Chat Message table with all required fields and establish relationships to the Chat Session table",
+            "dependencies": [
+              "2.3"
+            ],
+            "details": "1. In the migration file, define the `chat_messages` table with columns:\n   - `id`: UUID primary key with default gen_random_uuid()\n   - `created_at`: timestamp with default now()\n   - `chat_id`: UUID references chat_sessions(id) on delete cascade\n   - `role`: text not null (enum: 'user', 'assistant', 'system')\n   - `content`: text not null\n   - `type`: text not null default 'text' (for future message types)\n   - `image_url`: text (optional)\n2. Create a foreign key constraint linking `chat_id` to the `chat_sessions` table\n3. Add appropriate indexes, especially on the `chat_id` field\n4. Set up RLS policies consistent with the chat_sessions table",
+            "status": "pending",
+            "testStrategy": "Apply the migration and test the foreign key constraints by attempting to insert messages with both valid and invalid chat_id values"
+          },
+          {
+            "id": 5,
+            "title": "Configure Supabase client in NextJS application",
+            "description": "Set up the Supabase client in the NextJS application to connect to the local Supabase instance",
+            "dependencies": [
+              "2.4"
+            ],
+            "details": "1. Install Supabase JS client: `npm install @supabase/supabase-js`\n2. Create a `lib/supabase.ts` file to initialize the Supabase client\n3. Use environment variables for Supabase URL and anon key\n4. Create a `.env.local` file with the local development credentials\n5. Implement helper functions for common database operations (createChatSession, addChatMessage, getChatSessions, etc.)\n6. Add type definitions for database tables using Supabase's generated types",
+            "status": "pending",
+            "testStrategy": "Create a simple test component that performs basic CRUD operations against the local Supabase instance to verify connectivity and proper configuration"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Create basic UI layout and chat interface components",
+        "description": "Develop the core UI components for the chat interface including message display, input area, and basic layout.",
+        "status": "pending",
+        "dependencies": [
+          1
+        ],
+        "priority": "high",
+        "details": "Create React components for the main layout, chat container, message bubbles (user and AI), input area with send button, and header with app title. Implement responsive design using TailwindCSS. Style components to visually distinguish between user and AI messages. Create placeholder for the mode toggle button. Use ShadUI components for input fields, buttons, and other interactive elements. Implement basic state management for the chat interface without API integration yet.",
+        "testStrategy": "Verify UI renders correctly across different screen sizes. Test component composition and styling. Ensure the layout matches the requirements for a clean, minimal interface with focus on content."
+      },
+      {
+        "id": 4,
+        "title": "Implement OpenAI text chat with streaming responses",
+        "description": "Integrate OpenAI's GPT-4.1-nano model with streaming capability to enable real-time text chat functionality.",
+        "status": "pending",
+        "dependencies": [
+          3
+        ],
+        "priority": "high",
+        "details": "Create a service for OpenAI API communication. Implement the streaming API integration using OpenAI's SDK with the gpt-4.1-nano-2025-04-14 model. Set up server components in NextJS to handle the streaming responses. Create a client-side component to render the streaming text in real-time. Implement proper error handling for API failures. Use React state to manage the conversation flow and display messages as they arrive.",
+        "testStrategy": "Test the streaming functionality with various prompts. Verify that responses appear in real-time. Check error handling by simulating API failures. Ensure the UI updates correctly as new tokens arrive."
+      },
+      {
+        "id": 5,
+        "title": "Create Supabase Edge Functions for chat processing",
+        "description": "Develop Supabase Edge Functions to handle chat logic and API interactions with OpenAI.",
+        "status": "pending",
+        "dependencies": [
+          2,
+          4
+        ],
+        "priority": "medium",
+        "details": "Create Edge Functions in Supabase for handling chat requests. Implement functions to process user messages, call OpenAI API, and return streaming responses. Set up proper error handling and rate limit management. Create helper functions for formatting messages according to OpenAI's requirements. Implement functions to store chat messages in the database. Deploy Edge Functions to the local Supabase instance for testing.",
+        "testStrategy": "Test Edge Functions with sample requests. Verify they correctly process messages and call the OpenAI API. Check that responses are properly formatted and streamed back to the client. Ensure error cases are handled gracefully."
+      },
+      {
+        "id": 6,
+        "title": "Implement chat history storage in Supabase",
+        "description": "Connect the chat interface to Supabase to store and retrieve chat messages and sessions.",
+        "status": "pending",
+        "dependencies": [
+          2,
+          5
+        ],
+        "priority": "medium",
+        "details": "Create services to store new messages in the Chat Message table. Implement functions to create new chat sessions in the Chat Session table. Add logic to update chat session titles based on the first message. Develop functions to retrieve chat history for a specific session. Integrate these services with the chat interface components. Ensure proper error handling for database operations.",
+        "testStrategy": "Test creating new chat sessions and adding messages. Verify that messages are correctly stored and retrieved from the database. Check that chat session titles are properly generated and updated. Test error handling for database operations."
+      },
+      {
+        "id": 7,
+        "title": "Add image generation capability with OpenAI",
+        "description": "Integrate OpenAI's gpt-image-1 model to enable AI image generation based on user prompts.",
+        "status": "pending",
+        "dependencies": [
+          4,
+          5
+        ],
+        "priority": "medium",
+        "details": "Create a service for OpenAI image generation API using the gpt-image-1 model. Implement the API integration following the standard request/response pattern. Develop UI components to display generated images in the chat interface. Add logic to store image URLs in the database. Implement proper error handling for image generation failures. Create loading states for the image generation process.",
+        "testStrategy": "Test image generation with various prompts. Verify that images are correctly generated and displayed in the chat. Check that image URLs are properly stored in the database. Test error handling by simulating API failures."
+      },
+      {
+        "id": 8,
+        "title": "Implement mode toggle between text and image generation",
+        "description": "Create a toggle mechanism to switch between text chat and image generation modes in the interface.",
+        "status": "pending",
+        "dependencies": [
+          3,
+          7
+        ],
+        "priority": "medium",
+        "details": "Develop a toggle component using ShadUI to switch between text and image modes. Implement state management to track the current mode. Modify the input area and send button behavior based on the active mode. Update the UI to provide visual feedback about the current mode. Adjust the message processing logic to handle different types of requests based on the mode. Ensure smooth transitions between modes.",
+        "testStrategy": "Test switching between text and image modes. Verify that the UI updates correctly when the mode changes. Check that the appropriate API is called based on the active mode. Ensure the user experience remains intuitive when switching modes."
+      },
+      {
+        "id": 9,
+        "title": "Implement 'New Chat' functionality",
+        "description": "Add the ability to start a fresh conversation while storing the previous chat in Supabase.",
+        "status": "pending",
+        "dependencies": [
+          6
+        ],
+        "priority": "low",
+        "details": "Create a 'New Chat' button in the UI. Implement logic to save the current chat session before starting a new one. Develop functions to clear the conversation state and reset the interface. Update the database service to finalize the current chat session. Implement proper error handling for session transitions. Ensure the UI provides feedback during the transition process.",
+        "testStrategy": "Test creating new chat sessions from an existing conversation. Verify that the previous chat is correctly stored in the database. Check that the interface is properly reset for the new chat. Ensure error handling works correctly during the transition."
+      },
+      {
+        "id": 10,
+        "title": "Add error handling, loading states, and UI polish",
+        "description": "Enhance the application with comprehensive error handling, loading indicators, and final UI refinements.",
+        "status": "pending",
+        "dependencies": [
+          4,
+          7,
+          8,
+          9
+        ],
+        "priority": "low",
+        "details": "Implement comprehensive error handling throughout the application. Add loading indicators for API calls and database operations. Create error messages for common failure scenarios (API rate limits, network issues, etc.). Enhance the UI with subtle animations and transitions. Ensure responsive design works across all device sizes. Optimize performance by implementing proper React rendering strategies. Add final styling touches to match the clean, minimal design requirements.",
+        "testStrategy": "Test error scenarios by simulating various failure conditions. Verify that loading states are displayed appropriately. Check the application on different devices and browsers to ensure cross-compatibility. Conduct a final review of the UI against the PRD requirements."
+      }
+    ],
+    "metadata": {
+      "projectName": "GPT-Powered Chatbot with Image Generation",
+      "totalTasks": 10,
+      "sourceFile": "scripts/prd.txt",
+      "generatedAt": "2023-05-15",
+      "created": "2025-09-09T00:16:07.888Z",
+      "description": "Tasks for master context",
+      "updated": "2025-09-10T18:14:12.926Z"
+    }
+  }
+}

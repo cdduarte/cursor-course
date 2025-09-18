@@ -1,0 +1,11 @@
+# Task ID: 1
+# Title: Set up NextJS project with TailwindCSS and ShadUI
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Initialize the project structure with NextJS App Directory, configure TailwindCSS for styling, and integrate ShadUI component library.
+# Details:
+Create a new NextJS project using 'create-next-app' with the App Directory structure. Install and configure TailwindCSS following the official documentation. Add ShadUI library for reusable components. Set up environment variables for API keys and endpoints. Create the basic folder structure following NextJS conventions with app directory, components folder, and lib/utils.
+
+# Test Strategy:
+Verify that the NextJS development server runs without errors. Confirm TailwindCSS styles are working by testing a sample component. Ensure ShadUI components render correctly.

@@ -15,7 +15,7 @@ export default function ChatDemoPage() {
   // Mock state for messages
   const [messages, setMessages] = useState<Message[]>([]);
 
-  const handleSendMessage = (content: string, mode: 'text' | 'image') => {
+  const handleSendMessage = async (content: string, mode: 'text' | 'image') => {
     // Create new user message
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -27,18 +27,131 @@ export default function ChatDemoPage() {
     // Add user message
     setMessages(prev => [...prev, userMessage]);
 
-    // Simulate AI response after a short delay
-    setTimeout(() => {
-      const aiMessage: Message = {
+    try {
+      if (mode === 'text') {
+        await handleTextMessage(content);
+      } else {
+        await handleImageMessage(content);
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      // Add error message
+      const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: mode === 'image' 
-          ? `I'd be happy to help you generate an image based on: "${content}". However, image generation is not yet connected to the backend.`
-          : `Thanks for your message: "${content}". This is a mock response - the AI backend is not yet connected.`,
+        content: 'Sorry, I encountered an error while processing your request. Please try again.',
         type: 'text',
       };
-      setMessages(prev => [...prev, aiMessage]);
-    }, 1000);
+      setMessages(prev => [...prev, errorMessage]);
+    }
+  };
+
+  const handleTextMessage = async (content: string) => {
+    // Prepare message history for context (last 10 messages)
+    const history = messages.slice(-10).map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
+
+    try {
+      const response = await fetch('http://127.0.0.1:54321/functions/v1/chat-text', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0',
+        },
+        body: JSON.stringify({ message: content, history }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to get response');
+      }
+
+      // Create initial assistant message
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: '',
+        type: 'text',
+      };
+      
+      setMessages(prev => [...prev, assistantMessage]);
+
+      // Handle streaming response
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      
+      if (reader) {
+        let buffer = '';
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          
+          if (done) break;
+          
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          
+          for (const line of lines) {
+            if (line.trim()) {
+              try {
+                const data = JSON.parse(line);
+                if (data.content) {
+                  setMessages(prev => prev.map(msg => 
+                    msg.id === assistantMessage.id 
+                      ? { ...msg, content: msg.content + data.content }
+                      : msg
+                  ));
+                } else if (data.error) {
+                  throw new Error(data.error);
+                }
+              } catch (parseError) {
+                console.warn('Failed to parse streaming data:', line);
+              }
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Text message error:', error);
+      throw error;
+    }
+  };
+
+  const handleImageMessage = async (content: string) => {
+    try {
+      const response = await fetch('http://127.0.0.1:54321/functions/v1/chat-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0',
+        },
+        body: JSON.stringify({ prompt: content }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate image');
+      }
+
+      const data = await response.json();
+      
+      // Add assistant message with image
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: data.note || `Here's the image you requested: "${content}"`,
+        type: 'image',
+        image_url: data.image_url,
+      };
+      
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Image message error:', error);
+      throw error;
+    }
   };
 
   return (

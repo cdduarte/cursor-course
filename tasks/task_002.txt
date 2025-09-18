@@ -1,0 +1,73 @@
+# Task ID: 2
+# Title: Configure Supabase local instance and database schema
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Set up a local Supabase instance and create the database schema for storing chat sessions and messages.
+# Details:
+Install Supabase CLI and initialize a local Supabase instance. Create migration files for the database schema based on the data models specified in the PRD. Implement the Chat Session table with id, created_at, updated_at, and title fields. Create the Chat Message table with id, created_at, chat_id, role, content, type, and optional image_url fields. Set up foreign key relationships between tables. Configure Supabase client in the NextJS application.
+
+# Test Strategy:
+Run migrations and verify tables are created correctly. Test CRUD operations on both tables using the Supabase client. Ensure foreign key constraints work as expected.
+
+# Subtasks:
+## 1. Install and initialize Supabase CLI locally [pending]
+### Dependencies: None
+### Description: Set up the Supabase CLI and initialize a local Supabase instance for development
+### Details:
+1. Install Supabase CLI using npm: `npm install -g supabase`
+2. Initialize a new Supabase project: `npx supabase init`
+3. Start the local Supabase instance: `npx supabase start`
+4. Verify the installation by accessing the local Supabase Studio UI at the provided URL
+5. Save the local development credentials for later use in the application
+
+## 2. Create migration files for database schema [pending]
+### Dependencies: 2.1
+### Description: Create SQL migration files that define the database schema for chat sessions and messages
+### Details:
+1. Create a new migration file using Supabase CLI: `npx supabase migration new initial_schema`
+2. In the generated SQL file, define the schema for both tables
+3. Include proper timestamps, UUID fields, and appropriate data types
+4. Add indexes for frequently queried fields
+5. Define the schema version and migration metadata
+
+## 3. Implement Chat Session table [pending]
+### Dependencies: 2.2
+### Description: Create the Chat Session table with required fields and constraints
+### Details:
+1. In the migration file, define the `chat_sessions` table with columns:
+   - `id`: UUID primary key with default gen_random_uuid()
+   - `created_at`: timestamp with default now()
+   - `updated_at`: timestamp with default now()
+   - `title`: text not null
+   - `user_id`: UUID for future authentication integration
+2. Add appropriate indexes on frequently queried fields
+3. Set up RLS (Row Level Security) policies for future authentication
+
+## 4. Implement Chat Message table with foreign key relationships [pending]
+### Dependencies: 2.3
+### Description: Create the Chat Message table with all required fields and establish relationships to the Chat Session table
+### Details:
+1. In the migration file, define the `chat_messages` table with columns:
+   - `id`: UUID primary key with default gen_random_uuid()
+   - `created_at`: timestamp with default now()
+   - `chat_id`: UUID references chat_sessions(id) on delete cascade
+   - `role`: text not null (enum: 'user', 'assistant', 'system')
+   - `content`: text not null
+   - `type`: text not null default 'text' (for future message types)
+   - `image_url`: text (optional)
+2. Create a foreign key constraint linking `chat_id` to the `chat_sessions` table
+3. Add appropriate indexes, especially on the `chat_id` field
+4. Set up RLS policies consistent with the chat_sessions table
+
+## 5. Configure Supabase client in NextJS application [pending]
+### Dependencies: 2.4
+### Description: Set up the Supabase client in the NextJS application to connect to the local Supabase instance
+### Details:
+1. Install Supabase JS client: `npm install @supabase/supabase-js`
+2. Create a `lib/supabase.ts` file to initialize the Supabase client
+3. Use environment variables for Supabase URL and anon key
+4. Create a `.env.local` file with the local development credentials
+5. Implement helper functions for common database operations (createChatSession, addChatMessage, getChatSessions, etc.)
+6. Add type definitions for database tables using Supabase's generated types
+

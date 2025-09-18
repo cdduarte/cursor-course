@@ -1,0 +1,11 @@
+# Task ID: 3
+# Title: Create basic UI layout and chat interface components
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Develop the core UI components for the chat interface including message display, input area, and basic layout.
+# Details:
+Create React components for the main layout, chat container, message bubbles (user and AI), input area with send button, and header with app title. Implement responsive design using TailwindCSS. Style components to visually distinguish between user and AI messages. Create placeholder for the mode toggle button. Use ShadUI components for input fields, buttons, and other interactive elements. Implement basic state management for the chat interface without API integration yet.
+
+# Test Strategy:
+Verify UI renders correctly across different screen sizes. Test component composition and styling. Ensure the layout matches the requirements for a clean, minimal interface with focus on content.
