@@ -4,6 +4,7 @@ import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
 import { validateChatInput, validateImagePrompt } from "../lib/security";
 import { useStableId } from "../hooks/useStableId";
+import { getSupabaseConfig } from "../lib/config";
 
 interface Message {
   id: string;
@@ -17,6 +18,9 @@ export default function ChatDemoPage() {
   // Mock state for messages
   const [messages, setMessages] = useState<Message[]>([]);
   const generateId = useStableId();
+  
+  // Get Supabase configuration with validation
+  const supabaseConfig = getSupabaseConfig();
 
   const handleSendMessage = async (content: string, mode: 'text' | 'image') => {
     // Validate input on the frontend (additional validation after MessageInput)
@@ -75,11 +79,11 @@ export default function ChatDemoPage() {
     }));
 
     try {
-      const response = await fetch('http://127.0.0.1:54321/functions/v1/chat-text', {
+      const response = await fetch(`${supabaseConfig.url}/functions/v1/chat-text`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0',
+          'Authorization': `Bearer ${supabaseConfig.anonKey}`,
         },
         body: JSON.stringify({ message: content, history }),
       });
@@ -144,11 +148,11 @@ export default function ChatDemoPage() {
 
   const handleImageMessage = async (content: string) => {
     try {
-      const response = await fetch('http://127.0.0.1:54321/functions/v1/chat-image', {
+      const response = await fetch(`${supabaseConfig.url}/functions/v1/chat-image`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0',
+          'Authorization': `Bearer ${supabaseConfig.anonKey}`,
         },
         body: JSON.stringify({ prompt: content }),
       });
