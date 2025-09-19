@@ -1,4 +1,5 @@
 import React from 'react';
+import { validateImageUrl } from '../lib/security';
 
 interface Message {
   id: string;
@@ -98,13 +99,24 @@ export default function MessageList({ messages }: MessageListProps) {
               </p>
               
               {/* Image display for image messages */}
-              {message.type === 'image' && message.image_url && (
+              {message.type === 'image' && message.image_url && validateImageUrl(message.image_url) && (
                 <div className="mt-2 sm:mt-3">
                   <img
                     src={message.image_url}
                     alt="Generated image"
                     className="rounded-lg max-w-full h-auto"
+                    onError={(e) => {
+                      // Hide image if it fails to load
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
                   />
+                </div>
+              )}
+              
+              {/* Show warning if image URL is invalid */}
+              {message.type === 'image' && message.image_url && !validateImageUrl(message.image_url) && (
+                <div className="mt-2 sm:mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-700">
+                  ⚠️ Image URL validation failed - image not displayed for security reasons
                 </div>
               )}
             </div>

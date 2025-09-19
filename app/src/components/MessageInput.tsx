@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { validateChatInput, validateImagePrompt, rateLimiter } from '../lib/security';
 
 interface MessageInputProps {
   onSend: (message: string, mode: 'text' | 'image') => void;
@@ -8,6 +9,8 @@ interface MessageInputProps {
 export default function MessageInput({ onSend, disabled = false }: MessageInputProps) {
   const [message, setMessage] = useState('');
   const [mode, setMode] = useState<'text' | 'image'>('text');
+  const [validationError, setValidationError] = useState<string>('');
+  const [isRateLimited, setIsRateLimited] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-resize textarea
@@ -20,10 +23,34 @@ export default function MessageInput({ onSend, disabled = false }: MessageInputP
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim() && !disabled) {
-      onSend(message.trim(), mode);
-      setMessage('');
+    setValidationError('');
+    setIsRateLimited(false);
+    
+    if (!message.trim() || disabled) {
+      return;
     }
+    
+    // Check rate limiting
+    const rateLimit = mode === 'image' ? { max: 5, window: 60000 } : { max: 20, window: 60000 };
+    if (!rateLimiter.isAllowed(mode, rateLimit.max, rateLimit.window)) {
+      setIsRateLimited(true);
+      setValidationError(`Rate limit exceeded. Please wait before sending another ${mode} request.`);
+      return;
+    }
+    
+    // Validate input based on mode
+    const validation = mode === 'image' 
+      ? validateImagePrompt(message)
+      : validateChatInput(message);
+    
+    if (!validation.isValid) {
+      setValidationError(validation.errors.join('. '));
+      return;
+    }
+    
+    // Send the sanitized message
+    onSend(validation.sanitized, mode);
+    setMessage('');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -41,11 +68,23 @@ export default function MessageInput({ onSend, disabled = false }: MessageInputP
     ? 'Message ChatGPT...' 
     : 'Describe the image you want to generate...';
 
-  const canSend = message.trim().length > 0 && !disabled;
+  const canSend = message.trim().length > 0 && !disabled && !isRateLimited;
 
   return (
     <div className="border-t border-gray-200 bg-white px-3 sm:px-4 py-3 sm:py-4 flex-shrink-0">
       <div className="max-w-3xl mx-auto">
+        {/* Validation Error Display */}
+        {validationError && (
+          <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center">
+              <svg className="w-4 h-4 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm text-red-700">{validationError}</span>
+            </div>
+          </div>
+        )}
+        
         {/* Mode indicator */}
         {mode === 'image' && (
           <div className="mb-2 flex items-center text-xs sm:text-sm text-gray-600">

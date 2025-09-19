@@ -1,0 +1,160 @@
+---
+description: Generate and maintain a frontend security checklist log file for the GPT chatbot application
+globs: app/src/**/*.tsx, app/src/**/*.ts, supabase/functions/**/*.ts
+alwaysApply: true
+---
+
+# Frontend Security Checklist Rule
+
+This rule automatically generates and maintains a security checklist log file at `./logs/frontend_security_checklist.txt` based on the Security Best Practices and the current GPT-powered chatbot project.
+
+## Rule Purpose
+
+- **Monitor frontend security implementation** across React components, API routes, and Supabase Edge Functions
+- **Track security checklist items** specific to the chatbot application's architecture
+- **Log security status** for each critical area identified in the Security Best Practices guide
+- **Provide actionable items** for improving application security posture
+
+## Security Areas Monitored
+
+### 1. HTTPS Implementation
+- [ ] Verify all API endpoints use HTTPS
+- [ ] Check Next.js production deployment HTTPS configuration
+- [ ] Validate Supabase Edge Functions use secure connections
+- [ ] Ensure no mixed content warnings in browser
+
+### 2. Input Validation & XSS Prevention
+- [ ] Validate user chat input before processing
+- [ ] Sanitize message content before rendering
+- [ ] Check image generation prompts for malicious input
+- [ ] Verify React components properly escape user content
+- [ ] Validate OpenAI API response content before display
+
+### 3. Client-Side Data Security
+- [ ] Ensure no API keys stored in frontend code
+- [ ] Verify no sensitive data in localStorage/sessionStorage
+- [ ] Check that OpenAI API keys remain server-side only
+- [ ] Validate Supabase keys are properly configured
+- [ ] Ensure chat history doesn't contain sensitive data client-side
+
+### 4. CSRF Protection
+- [ ] Implement CSRF tokens for chat message submissions
+- [ ] Protect new chat creation endpoints
+- [ ] Validate image generation requests have proper tokens
+- [ ] Check Supabase client configuration for CSRF protection
+
+### 5. API Key Management
+- [ ] Verify OpenAI API key is only in environment variables
+- [ ] Check Supabase keys are properly secured
+- [ ] Ensure no hardcoded credentials in frontend
+- [ ] Validate API calls don't expose sensitive headers
+- [ ] Confirm Edge Functions properly handle API keys
+
+### 6. Authentication & Authorization
+- [ ] Plan for future user authentication implementation
+- [ ] Design proper session management for chat history
+- [ ] Consider rate limiting for anonymous users
+- [ ] Prepare authorization checks for protected features
+
+### 7. Content Security Policy
+- [ ] Implement CSP headers for the Next.js application
+- [ ] Configure CSP to allow OpenAI image URLs
+- [ ] Restrict script sources to prevent XSS
+- [ ] Set proper CSP for Supabase integration
+
+### 8. Error Handling
+- [ ] Ensure OpenAI API errors don't expose sensitive info
+- [ ] Verify Supabase errors are properly handled
+- [ ] Check that stack traces aren't exposed in production
+- [ ] Validate error messages don't reveal system details
+
+### 9. Rate Limiting
+- [ ] Implement rate limiting for chat requests
+- [ ] Protect image generation endpoint from abuse
+- [ ] Add rate limiting to Supabase Edge Functions
+- [ ] Monitor and log suspicious activity patterns
+
+### 10. Dependency Security
+- [ ] Keep Next.js dependencies updated
+- [ ] Monitor React and UI library security advisories
+- [ ] Update Supabase client libraries regularly
+- [ ] Scan for vulnerable npm packages
+
+## Implementation Guidelines
+
+### Automatic Log Generation
+When this rule is triggered (by changes to frontend files), it should:
+
+1. **Create logs directory** if it doesn't exist
+2. **Generate/update** `./logs/frontend_security_checklist.txt`
+3. **Include timestamp** for each checklist generation
+4. **Mark completed items** with [✓] and pending items with [ ]
+5. **Add notes** for each security area with current implementation status
+
+### Log File Format
+```
+=== Frontend Security Checklist ===
+Generated: [TIMESTAMP]
+Project: GPT-Powered Chatbot with Image Generation
+
+HTTPS Implementation:
+[ ] Verify all API endpoints use HTTPS
+    Status: Pending - Need to audit all API calls
+    Files: app/src/app/api/*, supabase/functions/*
+    
+[✓] Check Next.js production deployment HTTPS configuration
+    Status: Complete - Next.js handles HTTPS in production
+    Files: next.config.ts
+
+Input Validation & XSS Prevention:
+[ ] Validate user chat input before processing
+    Status: Needs implementation
+    Files: app/src/components/MessageInput.tsx
+    Action: Add input sanitization before API calls
+
+[Continue for all security areas...]
+
+=== Action Items ===
+1. High Priority: Implement input validation in MessageInput.tsx
+2. Medium Priority: Add CSP headers to Next.js configuration
+3. Low Priority: Plan authentication system architecture
+
+=== Notes ===
+- OpenAI API keys properly stored in environment variables
+- Supabase configuration needs security review
+- Consider implementing user authentication in Phase 2
+```
+
+### File Monitoring
+Monitor these specific files for security-related changes:
+- `app/src/components/MessageInput.tsx` - User input handling
+- `app/src/components/MessageList.tsx` - Content rendering
+- `app/src/app/page.tsx` - Main application logic
+- `app/src/app/api/**/*.ts` - API route security
+- `supabase/functions/**/*.ts` - Edge function security
+- `next.config.ts` - Security headers configuration
+- `package.json` - Dependency security
+
+### Integration with Development Workflow
+- **Generate checklist** after significant frontend changes
+- **Update status** when security measures are implemented
+- **Flag new security concerns** when new features are added
+- **Provide specific file references** for each security item
+
+## Usage Notes
+
+This rule helps maintain security awareness throughout development by:
+- Providing a living document of security status
+- Highlighting areas that need attention
+- Tracking progress on security implementations
+- Ensuring security considerations aren't forgotten during feature development
+
+The checklist should be reviewed and updated regularly, especially when:
+- Adding new features (image generation, chat history, etc.)
+- Modifying API integrations
+- Updating dependencies
+- Preparing for production deployment
+
+## Related Files
+- [Security_BestPractices.md](mdc:docs/tech/Security_BestPractices.md) - Source security guidelines
+- [prd.txt](mdc:scripts/prd.txt) - Project requirements and architecture

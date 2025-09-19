@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
+import { validateChatInput, validateImagePrompt } from "../lib/security";
+import { useStableId } from "../hooks/useStableId";
 
 interface Message {
   id: string;
@@ -14,13 +16,32 @@ interface Message {
 export default function ChatDemoPage() {
   // Mock state for messages
   const [messages, setMessages] = useState<Message[]>([]);
+  const generateId = useStableId();
 
   const handleSendMessage = async (content: string, mode: 'text' | 'image') => {
-    // Create new user message
+    // Validate input on the frontend (additional validation after MessageInput)
+    const validation = mode === 'image' 
+      ? validateImagePrompt(content)
+      : validateChatInput(content);
+    
+    if (!validation.isValid) {
+      console.error('Input validation failed:', validation.errors);
+      // Add validation error message
+      const errorMessage: Message = {
+        id: generateId(),
+        role: 'assistant',
+        content: `Input validation failed: ${validation.errors.join('. ')}`,
+        type: 'text',
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      return;
+    }
+
+    // Create new user message with sanitized content
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: generateId(),
       role: 'user',
-      content,
+      content: validation.sanitized,
       type: mode,
     };
 
@@ -29,15 +50,15 @@ export default function ChatDemoPage() {
 
     try {
       if (mode === 'text') {
-        await handleTextMessage(content);
+        await handleTextMessage(validation.sanitized);
       } else {
-        await handleImageMessage(content);
+        await handleImageMessage(validation.sanitized);
       }
     } catch (error) {
       console.error('Error sending message:', error);
       // Add error message
       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: generateId(),
         role: 'assistant',
         content: 'Sorry, I encountered an error while processing your request. Please try again.',
         type: 'text',
@@ -70,7 +91,7 @@ export default function ChatDemoPage() {
 
       // Create initial assistant message
       const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: generateId(),
         role: 'assistant',
         content: '',
         type: 'text',
@@ -99,6 +120,7 @@ export default function ChatDemoPage() {
               try {
                 const data = JSON.parse(line);
                 if (data.content) {
+                  // React will handle text escaping automatically when rendering
                   setMessages(prev => prev.map(msg => 
                     msg.id === assistantMessage.id 
                       ? { ...msg, content: msg.content + data.content }
@@ -138,13 +160,16 @@ export default function ChatDemoPage() {
 
       const data = await response.json();
       
+      // Use the response content directly - React will handle text escaping
+      const responseNote = data.note || `Here's the image you requested: "${content}"`;
+      
       // Add assistant message with image
       const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: generateId(),
         role: 'assistant',
-        content: data.note || `Here's the image you requested: "${content}"`,
+        content: responseNote,
         type: 'image',
-        image_url: data.image_url,
+        image_url: data.image_url, // URL validation happens in MessageList component
       };
       
       setMessages(prev => [...prev, assistantMessage]);
