@@ -1,0 +1,90 @@
+version: 2
+updates:
+  # Enable version updates for npm in the app directory
+  - package-ecosystem: "npm"
+    directory: "/app"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "barbarossa"  # Replace with actual GitHub username
+    assignees:
+      - "barbarossa"  # Replace with actual GitHub username
+    commit-message:
+      prefix: "security"
+      prefix-development: "deps-dev"
+      include: "scope"
+    # Group related updates together
+    groups:
+      security-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "security-update"
+      react-ecosystem:
+        patterns:
+          - "react*"
+          - "@types/react*"
+        update-types:
+          - "minor"
+          - "patch"
+      next-ecosystem:
+        patterns:
+          - "next*"
+          - "@next/*"
+        update-types:
+          - "minor"
+          - "patch"
+      supabase-ecosystem:
+        patterns:
+          - "@supabase/*"
+        update-types:
+          - "minor"
+          - "patch"
+      testing-ecosystem:
+        patterns:
+          - "@testing-library/*"
+          - "vitest*"
+          - "@vitest/*"
+        update-types:
+          - "minor"
+          - "patch"
+      ui-ecosystem:
+        patterns:
+          - "@radix-ui/*"
+          - "tailwind*"
+          - "lucide-react"
+        update-types:
+          - "minor"
+          - "patch"
+    # Ignore major version updates for these packages (manual review required)
+    ignore:
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "tailwindcss"
+        update-types: ["version-update:semver-major"]
+    # Security updates get higher priority
+    labels:
+      - "dependencies"
+      - "security"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "github-actions"
+      - "dependencies"

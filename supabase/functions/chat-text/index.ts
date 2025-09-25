@@ -1,6 +1,10 @@
 // Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+// @ts-ignore
 import OpenAI from "https://esm.sh/openai@4.85.3";
+
+// Declare Deno global if not available
+declare const Deno: any;
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -118,12 +122,3 @@ Deno.serve(async (req) => {
     });
   }
 });
-
-/* To invoke locally:
-
-  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/chat-text' \
-    --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
-    --header 'Content-Type: application/json' \
-    --data '{"message":"Hello, how are you?"}'
-
-*/

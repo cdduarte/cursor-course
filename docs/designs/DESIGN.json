@@ -1,0 +1,104 @@
+{
+    "designSystem": {
+      "meta": {
+        "name": "Neo-Gradient Futurism",
+        "description": "A futuristic, gradient-heavy design system with glowing 3D elements, glassmorphism, and soft neumorphism.",
+        "version": "1.0.0"
+      },
+      "colors": {
+        "gradientPrimary": {
+          "value": ["#FF6EC7", "#FFAA00", "#FF007F"],
+          "type": "gradient"
+        },
+        "gradientSecondary": {
+          "value": ["#7A5CFF", "#3DD6F5", "#00FFA3"],
+          "type": "gradient"
+        },
+        "backgroundLight": {
+          "value": "#F5F7FA",
+          "type": "color"
+        },
+        "backgroundDark": {
+          "value": "#1A1A1A",
+          "type": "color"
+        },
+        "neutral": {
+          "value": "#EAEAEA",
+          "type": "color"
+        }
+      },
+      "typography": {
+        "fontFamily": {
+          "primary": {
+            "value": "Inter, Poppins, SF Pro, sans-serif",
+            "type": "fontFamily"
+          }
+        },
+        "fontWeight": {
+          "regular": { "value": 400, "type": "fontWeight" },
+          "medium": { "value": 500, "type": "fontWeight" },
+          "semibold": { "value": 600, "type": "fontWeight" }
+        },
+        "textEffects": {
+          "softGlow": { "value": true, "type": "boolean" },
+          "gradientText": { "value": true, "type": "boolean" }
+        }
+      },
+      "shapes": {
+        "borderRadius": {
+          "small": { "value": "8px", "type": "borderRadius" },
+          "medium": { "value": "16px", "type": "borderRadius" },
+          "large": { "value": "24px", "type": "borderRadius" },
+          "xlarge": { "value": "32px", "type": "borderRadius" }
+        },
+        "chatBubble": {
+          "value": "pill",
+          "type": "shape"
+        },
+        "buttons": {
+          "value": "rounded-pill",
+          "type": "shape"
+        }
+      },
+      "effects": {
+        "shadows": {
+          "soft": {
+            "value": "0px 4px 12px rgba(0,0,0,0.15)",
+            "type": "boxShadow"
+          },
+          "glow": {
+            "value": "0px 0px 20px rgba(255,0,200,0.5)",
+            "type": "boxShadow"
+          }
+        },
+        "glassmorphism": {
+          "blur": { "value": "20px", "type": "blur" },
+          "opacity": { "value": 0.6, "type": "opacity" }
+        },
+        "lighting": {
+          "value": "diffused gradient lighting",
+          "type": "effect"
+        }
+      },
+      "layout": {
+        "padding": {
+          "small": { "value": "8px", "type": "spacing" },
+          "medium": { "value": "16px", "type": "spacing" },
+          "large": { "value": "32px", "type": "spacing" }
+        },
+        "alignment": {
+          "value": "centered",
+          "type": "alignment"
+        },
+        "depthLayers": {
+          "value": [
+            "foreground floating cards",
+            "midground chat bubbles",
+            "background gradient wash"
+          ],
+          "type": "layering"
+        }
+      }
+    }
+  }
+  
